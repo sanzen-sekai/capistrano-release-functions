@@ -37,15 +37,13 @@ release_utility_release(){
 
 	release_prefix="release:version-"
 	last=$(git log --format="%s" --grep="$release_prefix" | head -1)
-	last=${release_version%$release_prefix}
+	last=${last#$release_prefix}
 	release_utility_next_version
 
 	release_branch=$(git symbolic-ref --short HEAD)
 
-	echo branch: $release_branch
-	git show
-	echo
-	echo "release version: $version"
+	echo "branch:  $release_branch"
+	echo "version: $version"
 	read -p "OK? [y/n] " confirm
 	case "$confirm" in
 		y*)
