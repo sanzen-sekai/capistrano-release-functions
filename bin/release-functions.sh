@@ -38,6 +38,8 @@ release_utility_release(){
   done
 
   release_commit=$(git log -1 --format="%H")
+  release_branch=$(git symbolic-ref --short HEAD)
+
   release_utility_check_status
 
   release_prefix
@@ -45,8 +47,6 @@ release_utility_release(){
   last=$(git log --format="%s" --grep="$release_version_prefix" | head -1)
   last=${last#$release_version_prefix}
   release_utility_next_version
-
-  release_branch=$(git symbolic-ref --short HEAD)
 
   echo "branch:  $release_branch"
   echo "version: $version"
@@ -80,6 +80,13 @@ release_main(){
 release_utility_check_status(){
   if [ -z "$(git log --remotes="origin" --format="%H" | grep $release_commit)" ]; then
     echo "ローカルの HEAD ($release_commit) が origin に push されていません"
+    exit 1
+  fi
+
+  echo git fetch --tags --prune
+  git fetch -q --tags --prune
+  if [ -n "$(git log ${release_branch}..origin/${release_branch})" ]; then
+    echo "origin に pull していないコミットがあります"
     exit 1
   fi
 
