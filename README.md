@@ -44,6 +44,6 @@ release_prefix(){
 ```bash
 release_usage(){
   # custom usage message
-  echo "usage: ./release.sh [-m] [-p] [-b]"
+  echo "usage: ./release.sh [-m] [-p] [-b] [-f]"
 }
 ```
