@@ -31,3 +31,19 @@ release_utility_release "$@"
 clone https://github.com/sanzen-sekai/release-functions.git
 PATH=$PATH:/path/to/release-functions/bin
 ```
+
+## Configuration
+
+```bash
+release_prefix(){
+  : # release_prefix=PREFIX
+  # use in commit message : "release:${release_prefix}version-0.0.0"
+}
+```
+
+```bash
+release_usage(){
+  # custom usage message
+  echo "usage: ./release.sh [-m] [-p] [-b]"
+}
+```
