@@ -9,6 +9,7 @@ release_utility_release(){
   local confirm
   local release_commit
   local release_prefix
+  local release_version_prefix
   local release_branch
   local release_command
 
@@ -35,9 +36,10 @@ release_utility_release(){
   release_commit=$(git log -1 --format="%H")
   release_utility_check_status
 
-  release_prefix="release:version-"
-  last=$(git log --format="%s" --grep="$release_prefix" | head -1)
-  last=${last#$release_prefix}
+  release_prefix
+  release_version_prefix="release:${release_prefix}version-"
+  last=$(git log --format="%s" --grep="$release_version_prefix" | head -1)
+  last=${last#$release_version_prefix}
   release_utility_next_version
 
   release_branch=$(git symbolic-ref --short HEAD)
@@ -49,7 +51,7 @@ release_utility_release(){
     y*)
       echo "version: $version release start..."
       release_prepare
-      git commit --allow-empty -m "$release_prefix$version"
+      git commit --allow-empty -m "$release_version_prefix$version"
       git push origin $release_branch
       release_main
       ;;
@@ -61,6 +63,9 @@ release_utility_release(){
 }
 release_usage(){
   echo "usage: ./release.sh [-m] [-p] [-b]"
+}
+release_prefix(){
+  : # release_prefix=PREFIX
 }
 release_prepare(){
   : # prepare
@@ -95,8 +100,14 @@ release_utility_next_version(){
         minor=0
         patch=1
       else
-        major=0
-        minor=1
+        if [ -n "$is_beta" ]; then
+          major=0
+          minor=999
+          patch=1
+        else
+          major=0
+          minor=1
+        fi
       fi
     fi
   else
