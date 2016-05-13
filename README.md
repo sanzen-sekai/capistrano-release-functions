@@ -9,10 +9,13 @@ utility functions for release
 
 . release-functions.sh
 
-release_<PROJECT_NAME>(){
-	RELEASE_TAG=$release_commit bundle exec cap <STAGE_NAME> deploy
+release_prepare(){
+  : # pre git commit hook
 }
-release_utility_release release_<PROJECT_NAME> "$@"
+release_main(){
+  bundle exec cap <STAGE_NAME> deploy RELEASE_TAG=$release_commit
+}
+release_utility_release "$@"
 ```
 
 ```bash
