@@ -4,6 +4,7 @@ release_utility_release(){
   local is_major
   local is_patch
   local is_beta
+  local is_force
   local last
   local version
   local confirm
@@ -15,7 +16,7 @@ release_utility_release(){
 
   release_command=$1; shift
 
-  while getopts bmph OPT; do
+  while getopts fbmph OPT; do
     case $OPT in
       m)
         is_major=1
@@ -25,6 +26,9 @@ release_utility_release(){
         ;;
       b)
         is_beta=1
+        ;;
+      f)
+        is_force=1
         ;;
       h)
         release_usage
@@ -62,7 +66,7 @@ release_utility_release(){
   esac
 }
 release_usage(){
-  echo "usage: ./release.sh [-m] [-p] [-b]"
+  echo "usage: ./release.sh [-m] [-p] [-b] [-f]"
 }
 release_prefix(){
   : # release_prefix=PREFIX
@@ -74,15 +78,17 @@ release_main(){
   echo "override release_main function"
 }
 release_utility_check_status(){
-  if [ -n "$(git status --short)" ]; then
-    echo "commit されていない変更が残っています"
-    echo "commit か stash してください"
-    exit 1
-  fi
-
   if [ -z "$(git log --remotes="origin" --format="%H" | grep $release_commit)" ]; then
     echo "ローカルの HEAD ($release_commit) が origin に push されていません"
     exit 1
+  fi
+
+  if [ -n "$(git status --short)" ]; then
+    if [ -z "$is_force" ]; then
+      echo "commit されていない変更が残っています"
+      echo "もしこのままリリースしてしまいたいなら -f を指定してください"
+      exit 1
+    fi
   fi
 }
 release_utility_next_version(){
