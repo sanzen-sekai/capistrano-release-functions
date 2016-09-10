@@ -2,27 +2,33 @@
 
 utility functions for release
 
+## Requirements
+
+* https://github.com/sanzen-sekai/version-functions
+
 ## Usage
 
 ```bash
 # release.sh
-
 . release-functions.sh
-
-release_prepare(){
-  : # pre git commit hook
-}
-release_main(){
-  bundle exec cap <STAGE_NAME> deploy RELEASE_TAG=$release_commit
-}
-release_utility_release "$@"
+release_main "$@"
 ```
 
 ```bash
-./release.sh    # minor release
-./release.sh -m # major release
-./release.sh -p # patch release
-./release.sh -b # beta release => minor 999 version's patch release
+./release.sh <stage> [major|minor|patch|beta|exact] [version]
+```
+
+or specify stage in release.sh
+
+```bash
+# release.sh
+. release-functions.sh
+stage=production
+release_main "$@"
+```
+
+```bash
+./release.sh [major|minor|patch|beta|exact] [version]
 ```
 
 ## Installation
@@ -32,18 +38,25 @@ clone https://github.com/sanzen-sekai/release-functions.git
 PATH=$PATH:/path/to/release-functions/bin
 ```
 
-## Configuration
+## Options
 
 ```bash
-release_prefix(){
-  : # release_prefix=PREFIX
-  # use in commit message : "release:${release_prefix}version-0.0.0"
-}
-```
+# release.sh
+. release-functions.sh
 
-```bash
-release_usage(){
-  # custom usage message
-  echo "usage: ./release.sh [-m] [-p] [-b] [-f]"
+release_pre(){
+  # pre release
+  # if you want cancel, return non-zero value
+  echo $version # => release version
 }
+release_post(){
+  # post release
+  # if release failed, this function not execute
+  echo $version # => release version
+}
+release_deploy(){
+  bundle exec cap $stage deploy RELEASE_TAG=$release_commit
+}
+
+release_main "$@"
 ```
