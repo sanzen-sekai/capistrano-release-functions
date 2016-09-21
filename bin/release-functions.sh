@@ -71,10 +71,9 @@ release_check_status(){
     exit 1
   fi
 
-  echo git fetch --tags --prune
-  git fetch -q --tags --prune
   if [ -n "$(git log ${branch}..origin/${branch})" ]; then
     echo "origin に pull していないコミットがあります"
+    echo "したよ！という場合は git fetch で最新の origin を取得してみてください"
     exit 1
   fi
 
