@@ -21,12 +21,12 @@ release_main(){
 
   mode=$1; shift
   last=$1; shift
+  release_version_prefix="release:version-"
 
   if [ -z "$mode" ]; then
     mode=patch
   fi
   if [ -z "$last" ]; then
-    release_version_prefix="release:version-"
     last=$(git log --format="%s" --grep="$release_version_prefix" | head -1)
     last=${last#$release_version_prefix}
   fi
@@ -38,6 +38,7 @@ release_main(){
 
   version_build_next $mode $last
 
+  confirm=
   if [ -n "$branch" ]; then
     if [ "$branch" != master ]; then
       version=${version}.${branch}
@@ -52,8 +53,10 @@ release_main(){
       esac
     fi
   fi
-  echo "version: $version"
-  read -p "OK? [y/n] " confirm
+  if [ -z "$confirm" ]; then
+    echo "version: $version"
+    read -p "OK? [y/n] " confirm
+  fi
   case "$confirm" in
     y*)
       echo "version: $version release start..."
@@ -79,7 +82,17 @@ release_check_status(){
 
   if [ -n "$(git status --short)" ]; then
     echo "commit されていない変更が残っています"
-    exit 1
+    echo
+    git status
+    echo
+    read -p "このまま続けてしまいますか？ [Y/n] " confirm
+    case $confirm in
+      Y*|y*)
+        ;;
+      *)
+        exit 1
+        ;;
+    esac
   fi
 }
 
