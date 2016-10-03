@@ -36,7 +36,7 @@ release_main(){
 
   release_check_status
 
-  version_build_next $mode $last
+  version_build_next "$mode" "$last"
 
   confirm=
   if [ -n "$branch" ]; then
