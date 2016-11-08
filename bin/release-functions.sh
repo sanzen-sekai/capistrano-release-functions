@@ -19,8 +19,12 @@ release_main(){
     stage=$1; shift
   fi
 
-  mode=$1; shift
-  last=$1; shift
+  if [ $# -gt 1 ]; then
+    mode=$1; shift
+  fi
+  if [ $# -gt 1 ]; then
+    last=$1; shift
+  fi
   release_version_prefix="release:version-"
 
   if [ -z "$mode" ]; then
